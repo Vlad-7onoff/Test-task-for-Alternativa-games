@@ -1,13 +1,17 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerMover : MonoBehaviour
 {
     [SerializeField] private float _moveSpeed;
 
     private PlayerInput _input;
+    private Rigidbody _rigidbody;
 
     private void Awake()
     {
+        _rigidbody = GetComponent<Rigidbody>();
+        
         _input = new PlayerInput();
     }
 
@@ -21,7 +25,7 @@ public class PlayerMover : MonoBehaviour
         _input.Disable();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         Vector2 moveDirection = _input.Player.Move.ReadValue<Vector2>();
 
@@ -30,9 +34,9 @@ public class PlayerMover : MonoBehaviour
 
     private void Move(Vector2 direction)
     {
-        float scaledMoveSpeed = _moveSpeed * Time.deltaTime;
+        float scaledMoveSpeed = _moveSpeed * Time.fixedDeltaTime;
 
         Vector3 moveDirection = new Vector3(direction.x, 0, direction.y);
-        transform.position += moveDirection * scaledMoveSpeed;
+        _rigidbody.AddForce(moveDirection * scaledMoveSpeed, ForceMode.VelocityChange);
     }
 }
