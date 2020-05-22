@@ -25,18 +25,13 @@ public class PlayerMover : MonoBehaviour
         _input.Disable();
     }
 
-    private void FixedUpdate()
+    public void Move()
     {
-        Vector2 moveDirection = _input.Player.Move.ReadValue<Vector2>();
-
-        Move(moveDirection);
-    }
-
-    private void Move(Vector2 direction)
-    {
+        Vector2 inputDirection = _input.Player.Move.ReadValue<Vector2>();
         float scaledMoveSpeed = _moveSpeed * Time.fixedDeltaTime;
 
-        Vector3 moveDirection = new Vector3(direction.x, 0, direction.y);
+        Vector3 moveDirection = new Vector3(inputDirection.x, 0, inputDirection.y);
+
         _rigidbody.AddForce(moveDirection * scaledMoveSpeed, ForceMode.VelocityChange);
     }
 }
