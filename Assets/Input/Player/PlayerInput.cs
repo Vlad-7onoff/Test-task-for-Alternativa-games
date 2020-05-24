@@ -249,6 +249,44 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                     ""isPartOfComposite"": true
                 }
             ]
+        },
+        {
+            ""name"": ""UI"",
+            ""id"": ""e54389f7-1804-4a61-befd-c89f5b2cd766"",
+            ""actions"": [
+                {
+                    ""name"": ""RestartLevel"",
+                    ""type"": ""Button"",
+                    ""id"": ""b80ee9aa-59fd-432d-9e6c-e82001a9392c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""3dd8828b-f0f1-41c3-b60b-475e3356acc5"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""RestartLevel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ea86ad73-752e-4973-a41f-066bdd813345"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Mouse and keyboard"",
+                    ""action"": ""RestartLevel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -284,6 +322,9 @@ public class @PlayerInput : IInputActionCollection, IDisposable
         // Player
         m_Player = asset.FindActionMap("Player", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
+        // UI
+        m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
+        m_UI_RestartLevel = m_UI.FindAction("RestartLevel", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -362,6 +403,39 @@ public class @PlayerInput : IInputActionCollection, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // UI
+    private readonly InputActionMap m_UI;
+    private IUIActions m_UIActionsCallbackInterface;
+    private readonly InputAction m_UI_RestartLevel;
+    public struct UIActions
+    {
+        private @PlayerInput m_Wrapper;
+        public UIActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
+        public InputAction @RestartLevel => m_Wrapper.m_UI_RestartLevel;
+        public InputActionMap Get() { return m_Wrapper.m_UI; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
+        public void SetCallbacks(IUIActions instance)
+        {
+            if (m_Wrapper.m_UIActionsCallbackInterface != null)
+            {
+                @RestartLevel.started -= m_Wrapper.m_UIActionsCallbackInterface.OnRestartLevel;
+                @RestartLevel.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnRestartLevel;
+                @RestartLevel.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnRestartLevel;
+            }
+            m_Wrapper.m_UIActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @RestartLevel.started += instance.OnRestartLevel;
+                @RestartLevel.performed += instance.OnRestartLevel;
+                @RestartLevel.canceled += instance.OnRestartLevel;
+            }
+        }
+    }
+    public UIActions @UI => new UIActions(this);
     private int m_MouseandkeyboardSchemeIndex = -1;
     public InputControlScheme MouseandkeyboardScheme
     {
@@ -383,5 +457,9 @@ public class @PlayerInput : IInputActionCollection, IDisposable
     public interface IPlayerActions
     {
         void OnMove(InputAction.CallbackContext context);
+    }
+    public interface IUIActions
+    {
+        void OnRestartLevel(InputAction.CallbackContext context);
     }
 }

@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(PlayerMover))]
 public class Player : MonoBehaviour
 {
     private PlayerMover _mover;
+
+    public event UnityAction Died;
 
     private void Start()
     {
@@ -13,5 +16,10 @@ public class Player : MonoBehaviour
     private void FixedUpdate()
     {
         _mover.Move();
+    }
+
+    public void Die()
+    {
+        Died?.Invoke();
     }
 }
