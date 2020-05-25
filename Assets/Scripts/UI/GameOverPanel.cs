@@ -27,7 +27,7 @@ public class GameOverPanel : MonoBehaviour
         _gameOverGroup.interactable = false;
     }
 
-    public void OnRestartLevel(InputAction.CallbackContext context)
+    public void OnRestartKeyClick(InputAction.CallbackContext context)
     {
         if (_gameOverGroup.interactable == true)
             _restart.onClick?.Invoke();
